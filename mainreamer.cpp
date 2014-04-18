@@ -83,7 +83,7 @@ void MainReamer::paintGL() // none
     glEnd();
     if(settings["trash"]["show"].toBool() && !Cache.trash.isEmpty())
 //        DrawTrash();
-//    if(!range.isEmpty())
+    if(!range.isEmpty())
         DrawRange();
     if(!azimuth.isEmpty())
         DrawAzimuth();
@@ -160,14 +160,11 @@ qreal MainReamer::CalcAlpha(qreal angle) const
 void MainReamer::GenerationRange()
 {
     qreal r=.0f,delta,distance;
-    quint16 j=0u,d=0u;
+    quint8 j=0u,d=0u;
     range.clear();
 
-    //distance=CalcScaleValue(1.0f);
-    distance=0.1f;
-    delta=distance*10u;
-    j=5u;
-    /*switch(settings["system"]["range"].toUInt())
+    distance=CalcScaleValue(1.0f);
+    switch(settings["system"]["range"].toUInt())
     {
         case 1:
             delta=distance*10u;
@@ -179,7 +176,7 @@ void MainReamer::GenerationRange()
             delta=distance*50u;
             j=1u;
     }
-    */
+
     LineEntity cache;
     quint16 c;
     while(r<=1u)
@@ -213,6 +210,7 @@ void MainReamer::DrawRange() const
             {
                 alpha=alpha<settings["system"]["lightning"].toDouble() ? 1.0f : settings["system"]["lightning"].toDouble()/alpha;
                 glColor4f(static_cast<GLfloat>(.0),static_cast<GLfloat>(1.0),static_cast<GLfloat>(.0),alpha*settings["system"]["brightness"].toDouble());
+                glVertex2d(i->x,i->y);
             }
         }
         glEnd();

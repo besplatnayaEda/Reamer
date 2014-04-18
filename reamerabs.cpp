@@ -49,16 +49,25 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
             ui->RenderReamer->SetSettings("system","azimuth",static_cast<quint16>(2));
             break;
         case Qt::Key_4:
-            ui->RenderReamer->SetSettings("system","freq",static_cast<quint16>(1));
+            ui->RenderReamer->SetSettings("system","scale",static_cast<quint16>(90.0f));
 //            fps=static_cast<quint8>(24);
             break;
         case Qt::Key_5:
-            ui->RenderReamer->SetSettings("system","freq",static_cast<quint16>(2));
+            ui->RenderReamer->SetSettings("system","scale",static_cast<quint16>(180.0f));
 //            fps=static_cast<quint8>(48);
             break;
         case Qt::Key_6:
-            ui->RenderReamer->SetSettings("system","freq",static_cast<quint16>(3));
+            ui->RenderReamer->SetSettings("system","scale",static_cast<quint16>(360.0f));
 //            fps=static_cast<quint8>(72);
+            break;
+        case Qt::Key_7:
+            ui->RenderReamer->SetSettings("system","range",static_cast<quint16>(0));
+            break;
+        case Qt::Key_8:
+            ui->RenderReamer->SetSettings("system","range",static_cast<quint16>(1));
+            break;
+        case Qt::Key_9:
+            ui->RenderReamer->SetSettings("system","range",static_cast<quint16>(2));
             break;
 
     }

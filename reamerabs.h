@@ -5,7 +5,8 @@
 #include <QtGui>
 
 
-namespace Ui {
+namespace Ui
+{
 class ReamerABS;
 }
 
