@@ -83,7 +83,7 @@ void MainReamer::paintGL() // none
     glEnd();
     if(settings["trash"]["show"].toBool() && !Cache.trash.isEmpty())
 //        DrawTrash();
-    if(!range.isEmpty())
+//    if(!range.isEmpty())
         DrawRange();
     if(!azimuth.isEmpty())
         DrawAzimuth();
@@ -164,8 +164,10 @@ void MainReamer::GenerationRange()
     range.clear();
 
     //distance=CalcScaleValue(1.0f);
-    distance=1/360.f;
-    switch(settings["system"]["range"].toUInt())
+    distance=0.1f;
+    delta=distance*10u;
+    j=5u;
+    /*switch(settings["system"]["range"].toUInt())
     {
         case 1:
             delta=distance*10u;
@@ -177,7 +179,7 @@ void MainReamer::GenerationRange()
             delta=distance*50u;
             j=1u;
     }
-
+    */
     LineEntity cache;
     quint16 c;
     while(r<=1u)
