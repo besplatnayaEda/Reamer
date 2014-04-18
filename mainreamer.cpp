@@ -1,5 +1,6 @@
 #include "mainreamer.h"
 
+
 MainReamer::MainReamer(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers),parent)
 {
     clockwise=true; //По часовой стрелке
@@ -10,7 +11,7 @@ MainReamer::MainReamer(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers
     qsrand(QTime(0u,0u,0u).secsTo(QTime::currentTime()));
 
     //Переведём все используемые градусы в радианы
-    for(quint16 i=0u;i<361/*ANGLE_RANGE*/;i++)
+    for(quint16 i=0u;i<ANGLE_RANGE;i++)
     {
         radians[i].angle=GetRadianValue(i);
         radians[i].x=qFastCos(radians[i].angle);
@@ -55,13 +56,11 @@ void MainReamer::resizeGL(int width, int height)
     glEnable(GL_MULTISAMPLE);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
-//    glViewport(static_cast<GLint>(0u/*width/2-height/2*/),static_cast<GLint>(0u),static_cast<GLint>(768u),static_cast<GLint>(768u));
+    glOrtho(0.0, 0.0, 0.0, 1.0, 1.0, -1.0f);
     if(width>height)
         glViewport(static_cast<GLint>(width/2-height/2),static_cast<GLint>(0u),static_cast<GLint>(height),static_cast<GLint>(height));
     else
         glViewport(static_cast<GLint>(0u),static_cast<GLint>(height/2-width/2),static_cast<GLint>(width),static_cast<GLint>(width));
-    glOrtho(0, 0, 0, 0, -1, 1);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -135,12 +134,9 @@ void MainReamer::GenerationRay()
 
 void MainReamer::GenerationRay(qint16 angle)
 {
-    qint16 fr=1;
-//    fr=settings["system"]["freq"].toInt();
     ray.clear();
     Points*i=radians,*end=radians+angle;
-    while(i<end)ray.append(clockwise ? end=end-fr : i=i+fr);
-//    updateGL();
+    while(i<end)ray.append(clockwise ? end-- : i++);
 }
 
 qreal MainReamer::CalcAlpha(qreal angle) const
@@ -176,6 +172,7 @@ void MainReamer::GenerationRange()
             delta=distance*50u;
             j=1u;
     }
+//    printf("%f  %f\n",distance,delta);
 
     LineEntity cache;
     quint16 c;
@@ -342,7 +339,7 @@ qint8 MainReamer::GetRandomSign() const
 
 void MainReamer::LocatorArea() const
 {
-    color["locator"].isValid() ? qglColor(color["locator"]) : qglColor(QColor(255,153,0,255));
+    color["locator"].isValid() ? qglColor(color["locator"]) : qglColor(QColor(200,110,10,255));
     glBegin(GL_TRIANGLE_FAN);
         for(QVector<Points*>::const_iterator it=circle.begin();it<circle.end();it++)
             glVertex2d((*it)->x,(*it)->y);
