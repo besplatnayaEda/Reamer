@@ -124,7 +124,7 @@ template<typename OptionType>void MainReamer::SetSettings(const QString group,co
         {
             GenerationTrash();
             GenerationRange();
-//            GenerationLocalItems();
+            GenerationLocalItems();
 //            if(Cache.meteo.isEmpty())
 //                GenerationMeteo();
 //            if(Cache.active_noise_trash.isEmpty())
@@ -137,8 +137,8 @@ template<typename OptionType>void MainReamer::SetSettings(const QString group,co
         else if(name=="focus")
         {
 //            GenerationTrash();
-//            GenerationRange();
-//            GenerationAzimuth();
+            GenerationRange();
+            GenerationAzimuth();
         }
         else if(name=="mode")
         {

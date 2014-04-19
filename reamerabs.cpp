@@ -16,8 +16,10 @@ ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
     ui->RenderReamer->SetSettings("system","focus",static_cast<qreal>(100)/100);
     ui->RenderReamer->SetSettings("system","varu",static_cast<qreal>(1)/100);
     ui->RenderReamer->ChangeFPS(fps>0 ? 1000/fps : 0);
+    ui->RenderReamer->SetSettings("local_items","show",true);
+    ui->RenderReamer->SetSettings("trash","show",true);
+    ui->RenderReamer->SetSettings("trash","intensity",static_cast<quint8>(50));
 }
-
 
 ReamerABS::~ReamerABS()
 {

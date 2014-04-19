@@ -19,7 +19,7 @@ MainReamer::MainReamer(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers
     }
     radians_size=ArraySize(radians);
     circle.clear();
-    for(Points*i=radians,*end=radians+radians_size;i<end;circle.append(i),i+=3u); //Получаем координаты для отрисовки фона индикатора
+    for(Points*i=radians,*end=radians+radians_size;i<end;circle.append(i),i+=5u); //Получаем координаты для отрисовки фона индикатора
     GenerationRay();
     ray_position=ray.begin(); //Устанавливаем стартовую позицию луча
     ChangeFPS(0);
@@ -69,7 +69,7 @@ void MainReamer::paintGL() // none
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // чистим буфер изображения и буфер глубины
     glLoadIdentity(); // загружаем матрицу
     glPushMatrix();
-    glLineWidth(2.0f*1u*settings["system"]["focus"].toDouble());
+    glLineWidth(6u*settings["system"]["focus"].toDouble());
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);
     LocatorArea();
@@ -80,14 +80,14 @@ void MainReamer::paintGL() // none
     glVertex2d(static_cast<GLdouble>(.0f),static_cast<GLdouble>(.0f));
     glVertex2d((*ray_position)->x,(*ray_position)->y);
     glEnd();
-//    if(settings["trash"]["show"].toBool() && !Cache.trash.isEmpty())
-//        DrawTrash();
+    if(settings["trash"]["show"].toBool() && !Cache.trash.isEmpty())
+        DrawTrash();
     if(!range.isEmpty())
         DrawRange();
     if(!azimuth.isEmpty())
         DrawAzimuth();
     if(settings["local_items"]["show"].toBool() && !Cache.local_items.isEmpty())
-//        DrawLocalItems();
+        DrawLocalItems();
     if(settings["meteo"]["show"].toBool() && !Cache.meteo.isEmpty())
 //        DrawMeteo();
     if(settings["active_noise_trash"]["show"].toBool() && !Cache.active_noise_trash.isEmpty())
@@ -136,7 +136,7 @@ void MainReamer::GenerationRay(qint16 angle)
 {
     ray.clear();
     Points*i=radians,*end=radians+angle;
-    while(i<end)ray.append(clockwise ? end-- : i++);
+    while(i<end)ray.append(clockwise ? end-- : i+=2);
 }
 
 qreal MainReamer::CalcAlpha(qreal angle) const
@@ -172,13 +172,12 @@ void MainReamer::GenerationRange()
             delta=distance*50u;
             j=1u;
     }
-//    printf("%f  %f\n",distance,delta);
 
     LineEntity cache;
     quint16 c;
     while(r<=1u)
     {
-        cache.width=d%j==0u ? 3.5f : 1.0f;
+        cache.width=d%j==0u ? (d%(2*j)==0 ? 5.f : 3.f) : 1.0f;
         cache.Coordinates=new Points[radians_size];
         c=0u;
         for(Points *i=radians,*end=radians+radians_size;i<end;i++,c++)
@@ -200,7 +199,7 @@ void MainReamer::DrawRange() const
     {
         glLineWidth(it->width);
         glBegin(GL_LINE_LOOP);
-        for(Points *i=it->Coordinates,*end=it->Coordinates+radians_size;i<end;i++)
+        for(Points *i=it->Coordinates,*end=it->Coordinates+radians_size;i<end;i+=2)
         {
             alpha=CalcAlpha(i->angle);
             if(alpha>.0f)
@@ -232,7 +231,7 @@ void MainReamer::GenerationAzimuth()
     LineEntity cache;
     for(Points *i=radians,*k=radians+radians_size;i<k;i+=delta)
     {
-        cache.width=(i-radians)%30u>0 ? ((i-radians)%10u>0 ? ((i-radians)==0 ? 5.0f : 1.0f) : 2.0f) : 3.5f ;
+        cache.width=(i-radians)%30u>0 ? ((i-radians)%10u>0 ? ((i-radians)==0 ? 5.0f : 1.0f) : 3.f) : 5.f ;
         cache.Coordinates=new Points[1];
         cache.Coordinates->angle=i->angle;
         cache.Coordinates->x=i->x;
@@ -366,14 +365,14 @@ void MainReamer::DrawEllipseTrashArea(QVector<PointsPath>storage,quint8 size=8u)
     }
 }
 
-void MainReamer::GenerationTrash()
-{
-    CreateEllipseTrashArea(Cache.trash,settings["trash"]["begin"].toDouble(),settings["trash"]["end"].toDouble(),.0f,.0f,settings["trash"]["intensity"].toUInt() ?: 1u);
-}
-
 void MainReamer::GenerationLocalItems()
 {
     CreateEllipseTrashArea(Cache.local_items,.0f,15.0f,.0f,.0f);
+}
+
+void MainReamer::DrawLocalItems() const
+{
+    DrawEllipseTrashArea(Cache.local_items);
 }
 
 void MainReamer::GenerationMeteo()
@@ -472,4 +471,14 @@ void MainReamer::GenerationActiveNoiseTrash()
             }
             break;
     }
+}
+
+void MainReamer::GenerationTrash()
+{
+    CreateEllipseTrashArea(Cache.trash,settings["trash"]["begin"].toDouble(),settings["trash"]["end"].toDouble(),.0f,.0f,settings["trash"]["intensity"].toUInt() ?: 1u);
+}
+
+void MainReamer::DrawTrash() const
+{
+    DrawEllipseTrashArea(Cache.trash,2u);
 }
