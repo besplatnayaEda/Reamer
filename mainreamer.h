@@ -13,7 +13,6 @@
 #define METEO 5
 #endif
 
-
 #include<QGLWidget>
 #include<QColorDialog>
 #include<QVariant>
@@ -137,9 +136,9 @@ template<typename OptionType>void MainReamer::SetSettings(const QString group,co
             GenerationAzimuth();
         else if(name=="focus")
         {
-            GenerationTrash();
-            GenerationRange();
-            GenerationAzimuth();
+//            GenerationTrash();
+//            GenerationRange();
+//            GenerationAzimuth();
         }
         else if(name=="mode")
         {

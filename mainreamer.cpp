@@ -77,10 +77,10 @@ void MainReamer::paintGL() // none
     glColor4f(static_cast<GLfloat>(.0),static_cast<GLfloat>(1.0),static_cast<GLfloat>(.0),settings["system"]["brightness"].toFloat());//перерисовка линии
     glRotatef(90.0f,.0f,.0f,1.0);
     glBegin(GL_LINES);
-        glVertex2d(static_cast<GLdouble>(.0f),static_cast<GLdouble>(.0f));
-        glVertex2d((*ray_position)->x,(*ray_position)->y);
+    glVertex2d(static_cast<GLdouble>(.0f),static_cast<GLdouble>(.0f));
+    glVertex2d((*ray_position)->x,(*ray_position)->y);
     glEnd();
-    if(settings["trash"]["show"].toBool() && !Cache.trash.isEmpty())
+//    if(settings["trash"]["show"].toBool() && !Cache.trash.isEmpty())
 //        DrawTrash();
     if(!range.isEmpty())
         DrawRange();
@@ -199,7 +199,7 @@ void MainReamer::DrawRange() const
     for(QVector<LineEntity>::const_iterator it=range.begin();it<range.end();it++)
     {
         glLineWidth(it->width);
-        glBegin(GL_LINE_STRIP);
+        glBegin(GL_LINE_LOOP);
         for(Points *i=it->Coordinates,*end=it->Coordinates+radians_size;i<end;i++)
         {
             alpha=CalcAlpha(i->angle);
@@ -232,7 +232,7 @@ void MainReamer::GenerationAzimuth()
     LineEntity cache;
     for(Points *i=radians,*k=radians+radians_size;i<k;i+=delta)
     {
-        cache.width=(i-radians)%30u>0u ? 1.0f : 3.5f;
+        cache.width=(i-radians)%30u>0 ? ((i-radians)%10u>0 ? ((i-radians)==0 ? 5.0f : 1.0f) : 2.0f) : 3.5f ;
         cache.Coordinates=new Points[1];
         cache.Coordinates->angle=i->angle;
         cache.Coordinates->x=i->x;
