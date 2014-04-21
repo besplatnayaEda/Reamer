@@ -4,7 +4,7 @@
 #include<qmath.h>
 
 #ifndef GetRadianValue
-#define GetRadianValue(radian) M_PI*radian/180
+#define GetRadianValue(radian) M_PI*radian/1800
 #endif
 
 struct Daddy
@@ -30,7 +30,7 @@ struct Targets
 {
     Daddy Coordinates[5];
     qreal speed;
-    quint8 landing;
+    quint16 landing;
 };
 
 class Helper

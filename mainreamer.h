@@ -6,7 +6,7 @@
 #endif
 
 #ifndef ANGLE_RANGE
-#define ANGLE_RANGE 361
+#define ANGLE_RANGE 3601
 #endif
 
 #ifndef METEO
@@ -56,7 +56,7 @@ public:
     virtual bool IsActive() const;
     bool clockwise,
          show;
-    qint8 targets_pos;
+    qint16 targets_pos;
 
 signals:
 
@@ -79,7 +79,7 @@ protected:
     void DrawMeteo() const;
     void DrawTargets();
     qreal GetRandomCoord(quint8,const bool rsign=false) const;
-    qint8 GetRandomSign() const;
+    qint16 GetRandomSign() const;
     quint16 radians_size;
     virtual qreal CalcAlpha(qreal angle) const;
     qreal fps;
@@ -100,7 +100,7 @@ protected:
 
 
 private:
-    void DrawEllipseTrashArea(QVector<PointsPath>storage, quint8 size) const;
+    void DrawEllipseTrashArea(QVector<PointsPath>storage, quint16 size) const;
     QColorDialog* Color;
     QVector<LineEntity>azimuth;
     QMap<QString,QColor>color;

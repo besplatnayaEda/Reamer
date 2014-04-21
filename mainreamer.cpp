@@ -3,7 +3,7 @@
 
 MainReamer::MainReamer(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers),parent)
 {
-    clockwise=true; //По часовой стрелке
+    clockwise=settings["system"]["clws"].toBool(); //По часовой стрелке
     not_clean=true;
     show=true;
     targets_df=true;
@@ -19,7 +19,7 @@ MainReamer::MainReamer(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers
     }
     radians_size=ArraySize(radians);
     circle.clear();
-    for(Points*i=radians,*end=radians+radians_size;i<end;circle.append(i),i+=5u); //Получаем координаты для отрисовки фона индикатора
+    for(Points*i=radians,*end=radians+radians_size;i<end;circle.append(i),i+=50u); //Получаем координаты для отрисовки фона индикатора
     GenerationRay();
     ray_position=ray.begin(); //Устанавливаем стартовую позицию луча
     ChangeFPS(0);
@@ -73,7 +73,6 @@ void MainReamer::paintGL() // none
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);
     LocatorArea();
-//    DrawStation();
     glColor4f(static_cast<GLfloat>(.0),static_cast<GLfloat>(1.0),static_cast<GLfloat>(.0),settings["system"]["brightness"].toFloat());//перерисовка линии
     glRotatef(90.0f,.0f,.0f,1.0);
     glBegin(GL_LINES);
@@ -136,7 +135,7 @@ void MainReamer::GenerationRay(qint16 angle)
 {
     ray.clear();
     Points*i=radians,*end=radians+angle;
-    while(i<end)ray.append(clockwise ? end-- : i+=2);
+    while(i<end)ray.append(clockwise ? end-=1 : i+=1);
 }
 
 qreal MainReamer::CalcAlpha(qreal angle) const
@@ -146,7 +145,7 @@ qreal MainReamer::CalcAlpha(qreal angle) const
         alpha=1.0f;
     else
     {
-        alpha=(clockwise ? -1 : 1)*((*ray_position)->angle-angle)-.01;
+        alpha=(!clockwise ? -1 : 1)*((*ray_position)->angle-angle)-.01;
         if(not_clean && alpha<.0f)
             alpha+=2u*M_PI;
     }
@@ -156,7 +155,7 @@ qreal MainReamer::CalcAlpha(qreal angle) const
 void MainReamer::GenerationRange()
 {
     qreal r=.0f,delta,distance;
-    quint8 j=0u,d=0u;
+    quint16 j=0u,d=0u;
     range.clear();
 
     distance=CalcScaleValue(1.0f);
@@ -199,7 +198,7 @@ void MainReamer::DrawRange() const
     {
         glLineWidth(it->width);
         glBegin(GL_LINE_LOOP);
-        for(Points *i=it->Coordinates,*end=it->Coordinates+radians_size;i<end;i+=2)
+        for(Points *i=it->Coordinates,*end=it->Coordinates+radians_size;i<end;i+=20)
         {
             alpha=CalcAlpha(i->angle);
             if(alpha>.0f)
@@ -220,18 +219,18 @@ void MainReamer::GenerationAzimuth()
     switch(settings["system"]["azimuth"].toUInt())
     {
         case 1:
-            delta=5u;
+            delta=50u;
             break;
         case 0:
-            delta=360u;
+            delta=3600u;
             break;
         default:
-            delta=10u;
+            delta=100u;
     }
     LineEntity cache;
     for(Points *i=radians,*k=radians+radians_size;i<k;i+=delta)
     {
-        cache.width=(i-radians)%30u>0 ? ((i-radians)%10u>0 ? ((i-radians)==0 ? 5.0f : 1.0f) : 3.f) : 5.f ;
+        cache.width=(i-radians)%300u>0 ? ((i-radians)%100u>0 ? ((i-radians)==0 ? 5.0f : 1.0f) : 3.f) : 5.f ;
         cache.Coordinates=new Points[1];
         cache.Coordinates->angle=i->angle;
         cache.Coordinates->x=i->x;
@@ -261,6 +260,9 @@ void MainReamer::DrawAzimuth() const
 
 void MainReamer::ContinueSearch()
 {
+    quint16 speed;
+    clockwise=settings["system"]["clws"].toBool();
+    speed=settings["system"]["freq"].toUInt();
     updateGL();
     if(ray_position==ray.end()-1u)
     {
@@ -270,6 +272,20 @@ void MainReamer::ContinueSearch()
         targets_df=true;
     }
     ray_position++;
+    /*if(clockwise)
+    {
+        if(abs(ray.end()-ray_position)>speed)
+            ray_position+=speed;
+        else
+            ray_position++;
+    }
+    else
+    {
+        if((ray_position-ray.end())<speed)
+            ray_position-=speed;
+        else
+            ray_position--;
+    }*/
 }
 
 void MainReamer::CreateEllipseTrashArea(QVector<PointsPath>&storage,qreal offset_x,qreal offset_y,qreal intensity,bool ellipse,bool clear=true)
@@ -283,11 +299,11 @@ void MainReamer::CreateEllipseTrashArea(QVector<PointsPath>&storage,qreal begin,
     begin=CalcScaleValue(begin),
     end=CalcScaleValue(end);
     if(clear)
-        storage.clear();
+    storage.clear();
     PointsPath cache;
-    for(Points*i=radians,*k=radians+radians_size;i<k;i++)
+    for(Points*i=radians,*k=radians+radians_size;i<k;i+=10)
     {
-        for(quint16 l=0u,t=fmod(qrand(),intensity);l<t;l++)
+        for(quint16 l=0u,t=fmod(qrand(),intensity);l<t;l+=10)
         {
             if(ellipse)
             {
@@ -329,7 +345,7 @@ qreal MainReamer::GetRandomCoord(quint8 accuracy,const bool rsign) const
     return a;
 }
 
-qint8 MainReamer::GetRandomSign() const
+qint16 MainReamer::GetRandomSign() const
 {
     if(rand()%2u)
         return 1u;
@@ -345,7 +361,7 @@ void MainReamer::LocatorArea() const
     glEnd();
 }
 
-void MainReamer::DrawEllipseTrashArea(QVector<PointsPath>storage,quint8 size=8u) const
+void MainReamer::DrawEllipseTrashArea(QVector<PointsPath>storage,quint16 size=8u) const
 {
     glPointSize(size*settings["system"]["focus"].toDouble());
     glEnable(GL_ALPHA_TEST);

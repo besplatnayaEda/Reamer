@@ -24,7 +24,7 @@ private:
 
 protected:
     void keyPressEvent(QKeyEvent* ke);
-    qint8 fps;
+    qint8 fps;//,fr;
 };
 
 #endif // REAMERABS_H

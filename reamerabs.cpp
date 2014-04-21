@@ -4,12 +4,14 @@
 
 ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
 {
-    fps=static_cast<quint8>(60);
+    fps=static_cast<quint8>(30);
+//    fr=static_cast<quint8>(1);
 
     ui->setupUi(this);
+    ui->RenderReamer->SetSettings("system","clws",false);
     ui->RenderReamer->SetSettings("system","scale",static_cast<quint16>(360.0f));
     ui->RenderReamer->SetSettings("system","range",static_cast<quint16>(1));
-//    ui->RenderReamer->SetSettings("system","freq",static_cast<quint16>(1));
+    ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(1));
     ui->RenderReamer->SetSettings("system","azimuth",static_cast<quint16>(0));
     ui->RenderReamer->SetSettings("system","brightness",static_cast<qreal>(100)/100);
     ui->RenderReamer->SetSettings("system","lightning",static_cast<qreal>(100)/100);
@@ -77,6 +79,24 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
             break;
         case Qt::Key_Y:
             ui->RenderReamer->SetSettings("trash","show",false);
+            break;
+        case Qt::Key_Z:
+            ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(1));
+//            fr=static_cast<quint8>(1);
+            break;
+        case Qt::Key_X:
+            ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(2));
+//            fr=static_cast<quint8>(2);
+            break;
+        case Qt::Key_C:
+            ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(3));
+//            fr=static_cast<quint8>(3);
+            break;
+        case Qt::Key_V:
+            ui->RenderReamer->SetSettings("system","clws",true);
+            break;
+        case Qt::Key_B:
+            ui->RenderReamer->SetSettings("system","clws",false);
             break;
 
     }
