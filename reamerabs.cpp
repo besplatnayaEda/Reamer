@@ -7,10 +7,47 @@
 
 ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
 {
-    fps=static_cast<quint8>(0);//
-//    fr=static_cast<quint8>(1);
 
-    port->setBaudRate();
+    fps=static_cast<quint8>(0);
+//    fr=static_cast<quint8>(1);
+/*
+    port->setBaudRate(BAUD4800);
+    port->setParity(PAR_NONE);
+    port->setDataBits(DATA_8);
+    port->setStopBits(STOP_2);
+    port->setQueryMode(QextSerialPort::QueryMode(2));
+//QextSerialPort(QueryMode mode = EventDriven, QObject *parent = 0);
+*/
+    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
+        pname=info.portName;
+
+    timer = new QTimer(this);
+    timer->setInterval(40);
+    //! [1]
+    PortSettings settings = {BAUD4800, DATA_8, PAR_NONE, STOP_2, FLOW_OFF, 10};
+    port = new QextSerialPort("COM2", settings, QextSerialPort::Polling);
+    //! [1]
+
+    enumerator = new QextSerialEnumerator(this);
+    enumerator->setUpNotifications();
+
+    port->setPortName("COM2");
+    port->open(QIODevice::ReadWrite);
+    pread=QString::fromLatin1(port->readAll());
+    QTextStream Qcout(stdout);
+    Qcout <<QString::fromLatin1(port->readAll());
+    printf("deb");
+    Qcout << "46456";
+    switch (pread.toInt()) {
+    case 31:
+        ui->RenderReamer->SetSettings("system","clws",true);
+        break;
+    case 32:
+        ui->RenderReamer->SetSettings("system","clws",false);
+        break;
+    }
+
+//    port->readAll();
 
     ui->setupUi(this);
     ui->RenderReamer->SetSettings("system","clws",true);
@@ -55,7 +92,7 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
             }
             else
             {
-                fps=static_cast<quint8>(60);
+                fps=static_cast<quint8>(30);
                 ui->RenderReamer->ChangeFPS(fps>0 ? 1000/fps : 0);
                 ui->RenderReamer->SetSettings("system","brightness",static_cast<qreal>(100)/100);
                 ui->RenderReamer->SetSettings("system","lightning",static_cast<qreal>(100)/100);
@@ -118,17 +155,25 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
         case Qt::Key_B:
             ui->RenderReamer->SetSettings("system","clws",false);
             break;
+        case Qt::Key_R:
+//            port->write("test");
+        pread=QString::fromLatin1(port->read(1));
+        ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(pread.toInt()));
+        QTextStream Qcout(stdout);
+        Qcout <<pread.toInt();
+        break;
 
     }
 
 
 }
 
-void Dialog::changeEvent(QEvent *e)
+void ReamerABS::changeEvent(QEvent *e)
 {
-    QDialog::changeEvent(e);
+//    QDialog::changeEvent(e);
     switch (e->type()) {
     case QEvent::LanguageChange:
+        ui->retranslateUi(this);
         break;
     default:
         break;

@@ -33,6 +33,7 @@ protected:
     void keyPressEvent(QKeyEvent* ke);
     void changeEvent(QEvent *e);
     qint8 fps;//,fr;
+    QString pname,pread;
 };
 
 #endif // REAMERABS_H
