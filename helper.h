@@ -4,7 +4,7 @@
 #include<qmath.h>
 
 #ifndef GetRadianValue
-#define GetRadianValue(radian) M_PI*radian/1800
+#define GetRadianValue(radian) M_PI*radian/3600
 #endif
 
 struct Daddy

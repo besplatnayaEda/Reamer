@@ -8,7 +8,7 @@ ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
 //    fr=static_cast<quint8>(1);
 
     ui->setupUi(this);
-    ui->RenderReamer->SetSettings("system","clws",false);
+    ui->RenderReamer->SetSettings("system","clws",true);
     ui->RenderReamer->SetSettings("system","scale",static_cast<quint16>(360.0f));
     ui->RenderReamer->SetSettings("system","range",static_cast<quint16>(1));
     ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(1));

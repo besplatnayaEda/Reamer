@@ -6,7 +6,7 @@
 #endif
 
 #ifndef ANGLE_RANGE
-#define ANGLE_RANGE 3601
+#define ANGLE_RANGE 7201
 #endif
 
 #ifndef METEO
@@ -54,8 +54,7 @@ public:
     void ChangeTargetsState();
     QColor SelectColor(const QString,const QString);
     virtual bool IsActive() const;
-    bool clockwise,
-         show;
+    bool clockwise, show;
     qint16 targets_pos;
 
 signals:

@@ -3,7 +3,7 @@
 
 MainReamer::MainReamer(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers),parent)
 {
-    clockwise=settings["system"]["clws"].toBool(); //По часовой стрелке
+    clockwise=true; //По часовой стрелке
     not_clean=true;
     show=true;
     targets_df=true;
@@ -19,7 +19,7 @@ MainReamer::MainReamer(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers
     }
     radians_size=ArraySize(radians);
     circle.clear();
-    for(Points*i=radians,*end=radians+radians_size;i<end;circle.append(i),i+=50u); //Получаем координаты для отрисовки фона индикатора
+    for(Points*i=radians,*end=radians+radians_size;i<end;circle.append(i),i+=100u); //Получаем координаты для отрисовки фона индикатора
     GenerationRay();
     ray_position=ray.begin(); //Устанавливаем стартовую позицию луча
     ChangeFPS(0);
@@ -219,18 +219,18 @@ void MainReamer::GenerationAzimuth()
     switch(settings["system"]["azimuth"].toUInt())
     {
         case 1:
-            delta=50u;
+            delta=100u;
             break;
         case 0:
-            delta=3600u;
+            delta=7200u;
             break;
         default:
-            delta=100u;
+            delta=200u;
     }
     LineEntity cache;
     for(Points *i=radians,*k=radians+radians_size;i<k;i+=delta)
     {
-        cache.width=(i-radians)%300u>0 ? ((i-radians)%100u>0 ? ((i-radians)==0 ? 5.0f : 1.0f) : 3.f) : 5.f ;
+        cache.width=(i-radians)%600u>0 ? ((i-radians)%200u>0 ? ((i-radians)==0 ? 5.0f : 1.0f) : 3.f) : 5.f ;
         cache.Coordinates=new Points[1];
         cache.Coordinates->angle=i->angle;
         cache.Coordinates->x=i->x;
@@ -261,7 +261,7 @@ void MainReamer::DrawAzimuth() const
 void MainReamer::ContinueSearch()
 {
     quint16 speed;
-    clockwise=settings["system"]["clws"].toBool();
+    clockwise=!settings["system"]["clws"].toBool();
     speed=settings["system"]["freq"].toUInt();
     updateGL();
     if(ray_position==ray.end()-1u)
@@ -271,21 +271,20 @@ void MainReamer::ContinueSearch()
         ray_position=ray.begin();
         targets_df=true;
     }
-    ray_position++;
-    /*if(clockwise)
+    if(!clockwise)
     {
-        if(abs(ray.end()-ray_position)>speed)
+        /*if((ray.end()-ray_position)>speed)
             ray_position+=speed;
-        else
+        else*/
             ray_position++;
     }
     else
     {
-        if((ray_position-ray.end())<speed)
+        /*if((ray_position-ray.end())<speed)
             ray_position-=speed;
-        else
+        else*/
             ray_position--;
-    }*/
+    }
 }
 
 void MainReamer::CreateEllipseTrashArea(QVector<PointsPath>&storage,qreal offset_x,qreal offset_y,qreal intensity,bool ellipse,bool clear=true)
@@ -301,9 +300,9 @@ void MainReamer::CreateEllipseTrashArea(QVector<PointsPath>&storage,qreal begin,
     if(clear)
     storage.clear();
     PointsPath cache;
-    for(Points*i=radians,*k=radians+radians_size;i<k;i+=10)
+    for(Points*i=radians,*k=radians+radians_size;i<k;i+=20)
     {
-        for(quint16 l=0u,t=fmod(qrand(),intensity);l<t;l+=10)
+        for(quint16 l=0u,t=fmod(qrand(),intensity);l<t;l+=20)
         {
             if(ellipse)
             {
