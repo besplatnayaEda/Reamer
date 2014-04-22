@@ -1,21 +1,26 @@
+#include "qextserialport.h"
+#include "qextserialenumerator.h"
 #include "reamerabs.h"
 #include "ui_reamerabs.h"
 #include <QDebug>
+#include <QtCore>
 
 ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
 {
-    fps=static_cast<quint8>(30);
+    fps=static_cast<quint8>(0);
 //    fr=static_cast<quint8>(1);
+
+    port->setBaudRate();
 
     ui->setupUi(this);
     ui->RenderReamer->SetSettings("system","clws",true);
     ui->RenderReamer->SetSettings("system","scale",static_cast<quint16>(360.0f));
     ui->RenderReamer->SetSettings("system","range",static_cast<quint16>(1));
-    ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(1));
+    ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(8));
     ui->RenderReamer->SetSettings("system","azimuth",static_cast<quint16>(0));
-    ui->RenderReamer->SetSettings("system","brightness",static_cast<qreal>(100)/100);
-    ui->RenderReamer->SetSettings("system","lightning",static_cast<qreal>(100)/100);
-    ui->RenderReamer->SetSettings("system","focus",static_cast<qreal>(100)/100);
+    ui->RenderReamer->SetSettings("system","brightness",static_cast<qreal>(0)/100);
+    ui->RenderReamer->SetSettings("system","lightning",static_cast<qreal>(0)/100);
+    ui->RenderReamer->SetSettings("system","focus",static_cast<qreal>(0)/100);
     ui->RenderReamer->SetSettings("system","varu",static_cast<qreal>(1)/100);
     ui->RenderReamer->ChangeFPS(fps>0 ? 1000/fps : 0);
     ui->RenderReamer->SetSettings("local_items","show",true);
@@ -27,6 +32,7 @@ ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
 ReamerABS::~ReamerABS()
 {
     delete ui;
+    delete port;
 }
 
 void ReamerABS::keyPressEvent(QKeyEvent *ke)
@@ -39,9 +45,23 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
         case Qt::Key_S:
             {
             if(ui->RenderReamer->IsActive())
+            {
                 fps=0;
+                ui->RenderReamer->ChangeFPS(fps>0 ? 1000/fps : 0);
+                ui->RenderReamer->SetSettings("system","brightness",static_cast<qreal>(0)/100);
+                ui->RenderReamer->SetSettings("system","lightning",static_cast<qreal>(0)/100);
+                ui->RenderReamer->SetSettings("system","focus",static_cast<qreal>(0)/100);
+                ui->RenderReamer->SetSettings("system","varu",static_cast<qreal>(1)/100);
+            }
             else
-                fps=static_cast<quint8>(24);
+            {
+                fps=static_cast<quint8>(60);
+                ui->RenderReamer->ChangeFPS(fps>0 ? 1000/fps : 0);
+                ui->RenderReamer->SetSettings("system","brightness",static_cast<qreal>(100)/100);
+                ui->RenderReamer->SetSettings("system","lightning",static_cast<qreal>(100)/100);
+                ui->RenderReamer->SetSettings("system","focus",static_cast<qreal>(100)/100);
+                ui->RenderReamer->SetSettings("system","varu",static_cast<qreal>(1)/100);
+            }
             break;
             }
         case Qt::Key_1:
@@ -81,15 +101,15 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
             ui->RenderReamer->SetSettings("trash","show",false);
             break;
         case Qt::Key_Z:
-            ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(1));
+            ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(8));
 //            fr=static_cast<quint8>(1);
             break;
         case Qt::Key_X:
-            ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(2));
+            ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(16));
 //            fr=static_cast<quint8>(2);
             break;
         case Qt::Key_C:
-            ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(3));
+            ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(24));
 //            fr=static_cast<quint8>(3);
             break;
         case Qt::Key_V:
@@ -102,4 +122,15 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
     }
 
 
+}
+
+void Dialog::changeEvent(QEvent *e)
+{
+    QDialog::changeEvent(e);
+    switch (e->type()) {
+    case QEvent::LanguageChange:
+        break;
+    default:
+        break;
+    }
 }

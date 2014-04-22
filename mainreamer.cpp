@@ -276,14 +276,14 @@ void MainReamer::ContinueSearch()
         /*if((ray.end()-ray_position)>speed)
             ray_position+=speed;
         else*/
-            ray_position++;
+            ray_position+=speed;
     }
     else
     {
         /*if((ray_position-ray.end())<speed)
             ray_position-=speed;
         else*/
-            ray_position--;
+            ray_position-=speed;
     }
 }
 
