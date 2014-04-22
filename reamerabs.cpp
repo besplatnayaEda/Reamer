@@ -7,7 +7,7 @@
 
 ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
 {
-    fps=static_cast<quint8>(0);
+    fps=static_cast<quint8>(0);//
 //    fr=static_cast<quint8>(1);
 
     port->setBaudRate();
