@@ -18,36 +18,26 @@ ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
     port->setQueryMode(QextSerialPort::QueryMode(2));
 //QextSerialPort(QueryMode mode = EventDriven, QObject *parent = 0);
 */
+    /*
     foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
         pname=info.portName;
 
+
     timer = new QTimer(this);
     timer->setInterval(40);
-    //! [1]
+    */
     PortSettings settings = {BAUD4800, DATA_8, PAR_NONE, STOP_2, FLOW_OFF, 10};
-    port = new QextSerialPort("COM2", settings, QextSerialPort::Polling);
-    //! [1]
+    port = new QextSerialPort("COM5", settings, QextSerialPort::EventDriven);
 
+    /*
     enumerator = new QextSerialEnumerator(this);
     enumerator->setUpNotifications();
 
-    port->setPortName("COM2");
+    port->setPortName("COM5");
+    */
     port->open(QIODevice::ReadWrite);
-    pread=QString::fromLatin1(port->readAll());
-    QTextStream Qcout(stdout);
-    Qcout <<QString::fromLatin1(port->readAll());
-    printf("deb");
-    Qcout << "46456";
-    switch (pread.toInt()) {
-    case 31:
-        ui->RenderReamer->SetSettings("system","clws",true);
-        break;
-    case 32:
-        ui->RenderReamer->SetSettings("system","clws",false);
-        break;
-    }
+    connect(port, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 
-//    port->readAll();
 
     ui->setupUi(this);
     ui->RenderReamer->SetSettings("system","clws",true);
@@ -155,27 +145,48 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
         case Qt::Key_B:
             ui->RenderReamer->SetSettings("system","clws",false);
             break;
-        case Qt::Key_R:
-//            port->write("test");
-        pread=QString::fromLatin1(port->read(1));
-        ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(pread.toInt()));
-        QTextStream Qcout(stdout);
-        Qcout <<pread.toInt();
-        break;
 
     }
 
 
 }
 
-void ReamerABS::changeEvent(QEvent *e)
+void ReamerABS::onReadyRead()
 {
 //    QDialog::changeEvent(e);
+   /* pread=QString::fromLatin1((port->read(1)));
+    ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(pread.toInt()));
+    QTextStream Qcout(stdout);
+    Qcout <<pread.toInt();
     switch (e->type()) {
     case QEvent::LanguageChange:
         ui->retranslateUi(this);
         break;
     default:
         break;
+
+    }*/
+    QByteArray bytes;
+//    int a = port->bytesAvailable();
+//    bytes.resize(a);
+//    port->read(bytes.data(), bytes.size());
+    bytes = port->read(8);
+    QTextStream Qcout(stdout);
+//    Qcout << "\n bytes read:" << bytes.size();
+    Qcout << "\n bytes:" << bytes;
+    Qcout << "\n";
+    Qcout << "\n bytes int:" << bytes.toInt();
+    Qcout << "\n";
+    Qcout << "\n bytes hex:" << bytes.toHex();
+    Qcout << "\n";
+
+    switch (bytes.toInt()) {
+    case 1:
+        ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(8));
+        break;
+    case 0:
+        ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(24));
+        break;
     }
+
 }

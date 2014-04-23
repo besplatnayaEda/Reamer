@@ -5,7 +5,6 @@
 #-------------------------------------------------
 
 QT       += core gui opengl
-QT       += serialport
 CONFIG   += opengl
 
 

@@ -28,12 +28,20 @@ private:
     QTimer *timer;
     QextSerialPort *port;
     QextSerialEnumerator *enumerator;
+private slots:
+    void onReadyRead();
 
 protected:
     void keyPressEvent(QKeyEvent* ke);
-    void changeEvent(QEvent *e);
     qint8 fps;//,fr;
     QString pname,pread;
 };
+/*
+class portEvent: public QEvent {
 
+public:
+
+
+};
+*/
 #endif // REAMERABS_H
