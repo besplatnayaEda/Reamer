@@ -126,8 +126,8 @@ template<typename OptionType>void MainReamer::SetSettings(const QString group,co
             GenerationLocalItems();
 //            if(Cache.meteo.isEmpty())
 //                GenerationMeteo();
-//            if(Cache.active_noise_trash.isEmpty())
-//                GenerationActiveNoiseTrash();
+            if(Cache.active_noise_trash.isEmpty())
+                GenerationActiveNoiseTrash();
         }
         else if(name=="range")
             GenerationRange();
@@ -135,7 +135,7 @@ template<typename OptionType>void MainReamer::SetSettings(const QString group,co
             GenerationAzimuth();
         else if(name=="focus")
         {
-//            GenerationTrash();
+            GenerationTrash();
             GenerationRange();
             GenerationAzimuth();
         }
@@ -166,8 +166,8 @@ template<typename OptionType>void MainReamer::SetSettings(const QString group,co
     }
     else if (group=="active_noise_trash")
     {
-//        if(name=="azimuth" || name=="intensity")
-//            GenerationActiveNoiseTrash();
+        if(name=="azimuth" || name=="intensity")
+            GenerationActiveNoiseTrash();
     }
     if(group!="common")
         updateGL();

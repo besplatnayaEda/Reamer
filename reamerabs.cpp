@@ -26,8 +26,6 @@ ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
     timer = new QTimer(this);
     timer->setInterval(40);
     */
-    PortSettings settings = {BAUD4800, DATA_8, PAR_NONE, STOP_2, FLOW_OFF, 10};
-    port = new QextSerialPort("COM5", settings, QextSerialPort::EventDriven);
 
     /*
     enumerator = new QextSerialEnumerator(this);
@@ -35,8 +33,7 @@ ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
 
     port->setPortName("COM5");
     */
-    port->open(QIODevice::ReadWrite);
-    connect(port, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+
 
 
     ui->setupUi(this);
@@ -54,6 +51,12 @@ ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
     ui->RenderReamer->SetSettings("trash","show",false);
     ui->RenderReamer->SetSettings("trash","intensity",static_cast<quint8>(50));
     ui->RenderReamer->SetSettings("trash","begin",0.f);
+    ui->RenderReamer->SetSettings("active_noise_trash","show",false);
+
+    PortSettings settings = {BAUD4800, DATA_8, PAR_NONE, STOP_2, FLOW_OFF, 10};
+    port = new QextSerialPort("COM5", settings, QextSerialPort::EventDriven);
+    port->open(QIODevice::ReadWrite);
+    connect(port, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 }
 
 ReamerABS::~ReamerABS()
@@ -85,7 +88,7 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
                 fps=static_cast<quint8>(30);
                 ui->RenderReamer->ChangeFPS(fps>0 ? 1000/fps : 0);
                 ui->RenderReamer->SetSettings("system","brightness",static_cast<qreal>(100)/100);
-                ui->RenderReamer->SetSettings("system","lightning",static_cast<qreal>(100)/100);
+                ui->RenderReamer->SetSettings("system","lightning",static_cast<qreal>(20)/100);
                 ui->RenderReamer->SetSettings("system","focus",static_cast<qreal>(100)/100);
                 ui->RenderReamer->SetSettings("system","varu",static_cast<qreal>(1)/100);
             }
@@ -145,6 +148,14 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
         case Qt::Key_B:
             ui->RenderReamer->SetSettings("system","clws",false);
             break;
+        case Qt::Key_N:
+            ui->RenderReamer->SetSettings("active_noise_trash","show",true);
+            ui->RenderReamer->SetSettings("active_noise_trash","azimuth",static_cast<quint16>(240));
+            ui->RenderReamer->SetSettings("active_noise_trash","intensity",static_cast<quint8>(0));
+            break;
+        case Qt::Key_M:
+            ui->RenderReamer->SetSettings("active_noise_trash","show",false);
+            break;
 
     }
 
@@ -170,16 +181,48 @@ void ReamerABS::onReadyRead()
 //    int a = port->bytesAvailable();
 //    bytes.resize(a);
 //    port->read(bytes.data(), bytes.size());
-    bytes = port->read(8);
+    bytes = port->read(9);
     QTextStream Qcout(stdout);
 //    Qcout << "\n bytes read:" << bytes.size();
-    Qcout << "\n bytes:" << bytes;
+    quint8 b1=bytes[0],b2=bytes[1],b3=bytes[2],b4=bytes[3],b5=bytes[4],b6=bytes[5],b7=bytes[6],b8=bytes[7],b9=bytes[8];
+    Qcout << "\n bytes 1:" << b1;
+    Qcout << "\n bytes 2:" << b2;
+    Qcout << "\n bytes 3:" << b3;
+    Qcout << "\n bytes 4:" << b4;
+    Qcout << "\n bytes 5:" << b5;
+    Qcout << "\n bytes 6:" << b6;
+    Qcout << "\n bytes 7:" << b7;
+    Qcout << "\n bytes 8:" << b8;
+    Qcout << "\n bytes 9:" << b9;
     Qcout << "\n";
-    Qcout << "\n bytes int:" << bytes.toInt();
-    Qcout << "\n";
-    Qcout << "\n bytes hex:" << bytes.toHex();
-    Qcout << "\n";
+/*
+    if(b5==1)
+    {ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(0));
+    ui->RenderReamer->SetSettings("system","clws",true);}
+    if(b6==1)
+    {ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(8));
+        ui->RenderReamer->SetSettings("system","clws",true);}
+    if(b7==1)
+    {ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(16));
+        ui->RenderReamer->SetSettings("system","clws",true);}
+    if(b8==1)
+    {ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(24));
+        ui->RenderReamer->SetSettings("system","clws",true);}
+    if(b9==1)
+    {
+        if((b4-127-48)>0)
+            ui->RenderReamer->SetSettings("system","clws",true);
+        else
+            ui->RenderReamer->SetSettings("system","clws",false);
 
+        ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(abs(b4-127-48)));
+
+   // }*/
+
+
+
+
+    /*
     switch (bytes.toInt()) {
     case 1:
         ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(8));
@@ -187,6 +230,28 @@ void ReamerABS::onReadyRead()
     case 0:
         ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(24));
         break;
+    case 2:
+    {
+    if(ui->RenderReamer->IsActive())
+    {
+        fps=0;
+        ui->RenderReamer->ChangeFPS(fps>0 ? 1000/fps : 0);
+        ui->RenderReamer->SetSettings("system","brightness",static_cast<qreal>(0)/100);
+        ui->RenderReamer->SetSettings("system","lightning",static_cast<qreal>(0)/100);
+        ui->RenderReamer->SetSettings("system","focus",static_cast<qreal>(0)/100);
+        ui->RenderReamer->SetSettings("system","varu",static_cast<qreal>(1)/100);
     }
-
+    else
+    {
+        fps=static_cast<quint8>(30);
+        ui->RenderReamer->ChangeFPS(fps>0 ? 1000/fps : 0);
+        ui->RenderReamer->SetSettings("system","brightness",static_cast<qreal>(100)/100);
+        ui->RenderReamer->SetSettings("system","lightning",static_cast<qreal>(100)/100);
+        ui->RenderReamer->SetSettings("system","focus",static_cast<qreal>(100)/100);
+        ui->RenderReamer->SetSettings("system","varu",static_cast<qreal>(1)/100);
+    }
+    break;
+    }
+    }
+*/
 }
