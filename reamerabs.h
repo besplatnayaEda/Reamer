@@ -22,26 +22,20 @@ public:
     explicit ReamerABS(QWidget *parent = 0);
     ~ReamerABS();
 
-
 private:
     Ui::ReamerABS *ui;
     QTimer *timer;
     QextSerialPort *port;
     QextSerialEnumerator *enumerator;
+
 private slots:
     void onReadyRead();
 
 protected:
     void keyPressEvent(QKeyEvent* ke);
-    qint8 fps;//,fr;
+
+    quint8 fps,b1,b2,b3,b4,b5,b6,b7,b8,b9,reg1[7],reg2[7],reg3[7];
+
     QString pname,pread;
 };
-/*
-class portEvent: public QEvent {
-
-public:
-
-
-};
-*/
 #endif // REAMERABS_H

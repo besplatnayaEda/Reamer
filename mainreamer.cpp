@@ -4,7 +4,7 @@
 MainReamer::MainReamer(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers),parent)
 {
     clockwise=true; //По часовой стрелке
-    not_clean=true;
+    not_clean=false;
     show=true;
     targets_df=true;
     Color=new QColorDialog(this);
@@ -87,7 +87,7 @@ void MainReamer::paintGL() // none
         DrawAzimuth();
     if(settings["local_items"]["show"].toBool() && !Cache.local_items.isEmpty())
         DrawLocalItems();
-    if(settings["meteo"]["show"].toBool() && !Cache.meteo.isEmpty())
+//    if(settings["meteo"]["show"].toBool() && !Cache.meteo.isEmpty())
 //        DrawMeteo();
     if(settings["active_noise_trash"]["show"].toBool() && !Cache.active_noise_trash.isEmpty())
         DrawActiveNoiseTrash();
@@ -135,7 +135,7 @@ void MainReamer::GenerationRay(qint16 angle)
 {
     ray.clear();
     Points*i=radians,*end=radians+angle;
-    while(i<end)ray.append(clockwise ? end-=1 : i+=1);
+    while(i<end)ray.append(clockwise ? end-- : i++);
 }
 
 qreal MainReamer::CalcAlpha(qreal angle) const
@@ -145,7 +145,7 @@ qreal MainReamer::CalcAlpha(qreal angle) const
         alpha=1.0f;
     else
     {
-        alpha=(!clockwise ? -1 : 1)*((*ray_position)->angle-angle)-.01;
+        alpha=(!clockwise ? -1 : 1)*((*ray_position)->angle-angle)-.05;
         if(not_clean && alpha<.0f)
             alpha+=2u*M_PI;
     }
@@ -197,7 +197,7 @@ void MainReamer::DrawRange() const
     for(QVector<LineEntity>::const_iterator it=range.begin();it<range.end();it++)
     {
         glLineWidth(it->width);
-        glBegin(GL_LINE_LOOP);
+        glBegin(GL_LINE_STRIP);
         for(Points *i=it->Coordinates,*end=it->Coordinates+radians_size;i<end;i+=20)
         {
             alpha=CalcAlpha(i->angle);
@@ -264,15 +264,17 @@ void MainReamer::ContinueSearch()
     clockwise=!settings["system"]["clws"].toBool();
     speed=settings["system"]["freq"].toUInt();
     updateGL();
-    if(ray_position==ray.end()-1u)
-    {
-        if(!not_clean)
-            not_clean=true;
-        ray_position=ray.begin();
-        targets_df=true;
-    }
+
     if(!clockwise)
     {
+        if(ray_position==ray.end()-1u)
+        {
+            if(!not_clean)
+                not_clean=true;
+            ray_position=ray.begin();
+            targets_df=true;
+        }
+
         if((ray.end()-ray_position)>speed)
             ray_position+=speed;
         else
@@ -280,7 +282,7 @@ void MainReamer::ContinueSearch()
     }
     else
     {
-        if((ray_position-ray.end())<speed)
+        if((ray_position-ray.begin())>speed)
             ray_position-=speed;
         else
             ray_position-=1;
@@ -409,7 +411,7 @@ void MainReamer::GenerationActiveNoiseTrash()
     {
         case 0:
             angle=settings["active_noise_trash"]["azimuth"].toUInt();
-            for(Points*i=radians+radians_size-angle,*k=radians+radians_size-angle+400;i<k;i++)
+            for(Points*i=radians+radians_size-angle,*k=radians+radians_size-angle+400;i<k;i+=15)
             {
                 cache.Coordinates=new Points[1];
                 cache.Coordinates->angle=i->angle;
@@ -419,7 +421,7 @@ void MainReamer::GenerationActiveNoiseTrash()
                 Cache.active_noise_trash.append(cache);
             }
             if(angle<400)
-                for(Points*i=radians,*k=radians+400-angle;i<k;i++)
+                for(Points*i=radians,*k=radians+400-angle;i<k;i+=15)
                 {
                     cache.Coordinates=new Points[1];
                     cache.Coordinates->angle=i->angle;
@@ -431,7 +433,7 @@ void MainReamer::GenerationActiveNoiseTrash()
             break;
         case 1:
             angle=settings["active_noise_trash"]["azimuth"].toUInt();
-            for(Points*i=radians+radians_size-angle,*k=radians+radians_size-angle+600;i<k;i++)
+            for(Points*i=radians+radians_size-angle,*k=radians+radians_size-angle+600;i<k;i+=10)
             {
                 cache.Coordinates=new Points[1];
                 cache.Coordinates->angle=i->angle;
@@ -441,7 +443,18 @@ void MainReamer::GenerationActiveNoiseTrash()
                 Cache.active_noise_trash.append(cache);
             }
             angle=settings["active_noise_trash"]["azimuth"].toUInt()+2000;
-            for(Points*i=radians+radians_size-angle,*k=radians+radians_size-angle+400;i<k;i++)
+            for(Points*i=radians+radians_size-angle,*k=radians+radians_size-angle+400;i<k;i+=10)
+            {
+                cache.Coordinates=new Points[1];
+                cache.Coordinates->angle=i->angle;
+                cache.Coordinates->x=i->x;
+                cache.Coordinates->y=i->y;
+                cache.width=GetRandomCoord(4)*density;
+                cache.width-=4*density/5;
+                Cache.active_noise_trash.append(cache);
+            }
+            angle=settings["active_noise_trash"]["azimuth"].toUInt()+3000;
+            for(Points*i=radians+radians_size-angle,*k=radians+radians_size-angle+400;i<k;i+=10)
             {
                 cache.Coordinates=new Points[1];
                 cache.Coordinates->angle=i->angle;
@@ -452,18 +465,7 @@ void MainReamer::GenerationActiveNoiseTrash()
                 Cache.active_noise_trash.append(cache);
             }
             angle=settings["active_noise_trash"]["azimuth"].toUInt()+4000;
-            for(Points*i=radians+radians_size-angle,*k=radians+radians_size-angle+400;i<k;i++)
-            {
-                cache.Coordinates=new Points[1];
-                cache.Coordinates->angle=i->angle;
-                cache.Coordinates->x=i->x;
-                cache.Coordinates->y=i->y;
-                cache.width=GetRandomCoord(4)*density;
-                cache.width-=4*density/5;
-                Cache.active_noise_trash.append(cache);
-            }
-            angle=settings["active_noise_trash"]["azimuth"].toUInt()+6000;
-            for(Points*i=radians+radians_size-angle,*k=radians+radians_size-angle+400;i<k;i++)
+            for(Points*i=radians+radians_size-angle,*k=radians+radians_size-angle+400;i<k;i+=10)
             {
                 cache.Coordinates=new Points[1];
                 cache.Coordinates->angle=i->angle;
@@ -475,7 +477,8 @@ void MainReamer::GenerationActiveNoiseTrash()
             }
             break;
         case 2:
-            for(Points*i=radians+settings["active_noise_trash"]["azimuth"].toUInt()+260,*k=radians+settings["active_noise_trash"]["azimuth"].toUInt()+280;i<k;i++)
+            angle=settings["active_noise_trash"]["azimuth"].toUInt();
+            for(Points*i=radians+angle+260,*k=radians+angle+280;i<k;i+=20)
             {
                 cache.Coordinates=new Points[1];
                 cache.Coordinates->angle=i->angle;
