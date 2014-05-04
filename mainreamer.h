@@ -20,6 +20,8 @@
 #include<QBasicTimer>
 #include<QTimerEvent>
 #include<QDebug>
+#include<QtGui>
+#include<QThread>
 #include"helper.h"
 
 #ifndef ArraySize
@@ -182,5 +184,13 @@ template<typename T>T MainReamer::CalcScaleValue(const T value) const
 {
     return Helper::CalcScaleValue(value,settings["system"]["scale"].toUInt());
 }
+
+//class DrawRangeThread : public MainReamer, public QThread {
+
+//public:
+//    virtual void run();
+
+//};
+
 
 #endif // MAINREAMER_H

@@ -136,7 +136,7 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
 
 void ReamerABS::onReadyRead()
 {
-    quint8 i;
+//    quint8 i;
     QByteArray bytes;
     bytes = port->read(9);
     QTextStream Qcout(stdout);
@@ -153,10 +153,10 @@ void ReamerABS::onReadyRead()
 //        Qcout << "\n" << reg1[i];
 //    }
 
-    Qcout << "\n bytes 1:" << b1;
-    Qcout << "\n bytes 2:" << b2;
-    Qcout << "\n bytes 3:" << b3;
-    Qcout << "\n bytes 4:" << b4;
+    Qcout << "\n bytes 1:" << b1 << " reg1_0: " << reg1[0] << " reg1_1: " << reg1[1] << " reg1_2: " << reg1[2] << " reg1_3: " << reg1[3] << " reg1_4: " << reg1[4] << " reg1_5: " << reg1[5] << " reg1_6: " << reg1[6] << " reg1_7: " << reg1[7];
+    Qcout << "\n bytes 2:" << b2 << " reg2_0: " << reg2[0] << " reg2_1: " << reg2[1] << " reg2_2: " << reg2[2] << " reg2_3: " << reg2[3] << " reg2_4: " << reg2[4] << " reg2_5: " << reg2[5] << " reg2_6: " << reg2[6] << " reg2_7: " << reg2[7];
+    Qcout << "\n bytes 3:" << b3 << " reg3_0: " << reg3[0] << " reg3_1: " << reg3[1] << " reg3_2: " << reg3[2] << " reg3_3: " << reg3[3] << " reg3_4: " << reg3[4] << " reg3_5: " << reg3[5] << " reg3_6: " << reg3[6] << " reg3_7: " << reg3[7];
+    Qcout << "\n bytes 4:" << b4-60;
     Qcout << "\n bytes 5:" << b5;
     Qcout << "\n bytes 6:" << b6;
     Qcout << "\n bytes 7:" << b7;
@@ -178,12 +178,12 @@ void ReamerABS::onReadyRead()
      ui->RenderReamer->SetSettings("system","clws",true);}
     if(b9==1)
     {
-        if((b4-60)>0)
+        if((b4-120)>0)
             ui->RenderReamer->SetSettings("system","clws",true);
         else
             ui->RenderReamer->SetSettings("system","clws",false);
 
-        ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(abs(b4-60)));
+        ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(abs(b4-120)));
 
     }
 

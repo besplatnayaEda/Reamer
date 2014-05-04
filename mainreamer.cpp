@@ -23,6 +23,7 @@ MainReamer::MainReamer(QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers
     GenerationRay();
     ray_position=ray.begin(); //Устанавливаем стартовую позицию луча
     ChangeFPS(0);
+
 }
 
 void MainReamer::timerEvent(QTimerEvent *event)
@@ -79,9 +80,11 @@ void MainReamer::paintGL() // none
     glVertex2d(static_cast<GLdouble>(.0f),static_cast<GLdouble>(.0f));
     glVertex2d((*ray_position)->x,(*ray_position)->y);
     glEnd();
+//    DrawRangeThread DRThread;
     if(settings["trash"]["show"].toBool() && !Cache.trash.isEmpty())
         DrawTrash();
     if(!range.isEmpty())
+//        DRThread.start();
         DrawRange();
     if(!azimuth.isEmpty())
         DrawAzimuth();
@@ -135,6 +138,7 @@ void MainReamer::GenerationRay(qint16 angle)
 {
     ray.clear();
     Points*i=radians,*end=radians+angle;
+//qDebug("%d  %d  %d  %d",angle,i,end,radians);
     while(i<end)ray.append(clockwise ? end-- : i++);
 }
 
@@ -145,12 +149,46 @@ qreal MainReamer::CalcAlpha(qreal angle) const
         alpha=1.0f;
     else
     {
-        alpha=(!clockwise ? -1 : 1)*((*ray_position)->angle-angle)-.05;
+        alpha=(clockwise ? -1 : 1)*((*ray_position)->angle-angle)-.01;
         if(not_clean && alpha<.0f)
             alpha+=2u*M_PI;
     }
     return alpha;
 }
+
+void MainReamer::ContinueSearch()
+{
+    quint16 speed;
+    clockwise=settings["system"]["clws"].toBool();
+    speed=settings["system"]["freq"].toUInt();
+    updateGL();
+//    qDebug("%d  %d  %d",ray.end(),ray.begin(),ray_position);
+    if(clockwise)
+    {
+        if(ray_position==ray.end()-1u)
+        {
+            if(!not_clean)
+                not_clean=true;
+            GenerationRay();
+            ray_position=ray.begin();
+            targets_df=true;
+        }
+
+        if((ray.end()-ray_position)>speed)
+            ray_position+=speed;
+        else
+            ray_position+=1;
+    }
+    else
+    {
+        not_clean=false;
+        if((ray_position-ray.begin())>speed)
+            ray_position-=speed;
+        else
+            ray_position-=1;
+    }
+}
+
 
 void MainReamer::GenerationRange()
 {
@@ -191,6 +229,27 @@ void MainReamer::GenerationRange()
     }
 }
 
+//void DrawRangeThread::run()
+//{
+//    qreal alpha;
+//    for(QVector<LineEntity>::const_iterator it=range.begin();it<range.end();it++)
+//    {
+//        glLineWidth(it->width);
+//        glBegin(GL_LINE_STRIP);
+//        for(Points *i=it->Coordinates,*end=it->Coordinates+radians_size;i<end;i+=20)
+//        {
+//            alpha=CalcAlpha(i->angle);
+//            if(alpha>.0f)
+//            {
+//                alpha=alpha<settings["system"]["lightning"].toDouble() ? 1.0f : settings["system"]["lightning"].toDouble()/alpha;
+//                glColor4f(static_cast<GLfloat>(.0),static_cast<GLfloat>(1.0),static_cast<GLfloat>(.0),alpha*settings["system"]["brightness"].toDouble());
+//                glVertex2d(i->x,i->y);
+//            }
+//        }
+//        glEnd();
+//    }
+//}
+
 void MainReamer::DrawRange() const
 {
     qreal alpha;
@@ -211,6 +270,7 @@ void MainReamer::DrawRange() const
         glEnd();
     }
 }
+
 
 void MainReamer::GenerationAzimuth()
 {
@@ -255,37 +315,6 @@ void MainReamer::DrawAzimuth() const
             glVertex2f(it->Coordinates->x,it->Coordinates->y);
             glEnd();
         }
-    }
-}
-
-void MainReamer::ContinueSearch()
-{
-    quint16 speed;
-    clockwise=!settings["system"]["clws"].toBool();
-    speed=settings["system"]["freq"].toUInt();
-    updateGL();
-
-    if(!clockwise)
-    {
-        if(ray_position==ray.end()-1u)
-        {
-            if(!not_clean)
-                not_clean=true;
-            ray_position=ray.begin();
-            targets_df=true;
-        }
-
-        if((ray.end()-ray_position)>speed)
-            ray_position+=speed;
-        else
-            ray_position+=1;
-    }
-    else
-    {
-        if((ray_position-ray.begin())>speed)
-            ray_position-=speed;
-        else
-            ray_position-=1;
     }
 }
 
