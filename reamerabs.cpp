@@ -22,10 +22,12 @@ ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
     ui->RenderReamer->SetSettings("system","varu",static_cast<qreal>(1)/100);
     ui->RenderReamer->ChangeFPS(fps>0 ? 1000/fps : 0);
     ui->RenderReamer->SetSettings("local_items","show",true);
-    ui->RenderReamer->SetSettings("trash","show",false);
+    ui->RenderReamer->SetSettings("trash","show",true);
     ui->RenderReamer->SetSettings("trash","intensity",static_cast<quint8>(50));
     ui->RenderReamer->SetSettings("trash","begin",0.f);
-    ui->RenderReamer->SetSettings("active_noise_trash","show",false);
+    ui->RenderReamer->SetSettings("active_noise_trash","show",true);
+    ui->RenderReamer->SetSettings("active_noise_trash","azimuth",static_cast<quint16>(2400));
+    ui->RenderReamer->SetSettings("active_noise_trash","intensity",static_cast<quint8>(1));
 
     PortSettings settings = {BAUD4800, DATA_8, PAR_NONE, STOP_2, FLOW_OFF, 10};
     port = new QextSerialPort("COM5", settings, QextSerialPort::EventDriven);
@@ -122,8 +124,7 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
         case Qt::Key_N:
             ui->RenderReamer->SetSettings("active_noise_trash","show",true);
             ui->RenderReamer->SetSettings("active_noise_trash","azimuth",static_cast<quint16>(2400));
-            ui->RenderReamer->SetSettings("active_noise_trash","intensity",static_cast<quint8>(1
-                                                                                               ));
+            ui->RenderReamer->SetSettings("active_noise_trash","intensity",static_cast<quint8>(1));
             break;
         case Qt::Key_M:
             ui->RenderReamer->SetSettings("active_noise_trash","show",false);
@@ -156,7 +157,7 @@ void ReamerABS::onReadyRead()
     Qcout << "\n bytes 1:" << b1 << " reg1_0: " << reg1[0] << " reg1_1: " << reg1[1] << " reg1_2: " << reg1[2] << " reg1_3: " << reg1[3] << " reg1_4: " << reg1[4] << " reg1_5: " << reg1[5] << " reg1_6: " << reg1[6] << " reg1_7: " << reg1[7];
     Qcout << "\n bytes 2:" << b2 << " reg2_0: " << reg2[0] << " reg2_1: " << reg2[1] << " reg2_2: " << reg2[2] << " reg2_3: " << reg2[3] << " reg2_4: " << reg2[4] << " reg2_5: " << reg2[5] << " reg2_6: " << reg2[6] << " reg2_7: " << reg2[7];
     Qcout << "\n bytes 3:" << b3 << " reg3_0: " << reg3[0] << " reg3_1: " << reg3[1] << " reg3_2: " << reg3[2] << " reg3_3: " << reg3[3] << " reg3_4: " << reg3[4] << " reg3_5: " << reg3[5] << " reg3_6: " << reg3[6] << " reg3_7: " << reg3[7];
-    Qcout << "\n bytes 4:" << b4-60;
+    Qcout << "\n bytes 4:" << b4;
     Qcout << "\n bytes 5:" << b5;
     Qcout << "\n bytes 6:" << b6;
     Qcout << "\n bytes 7:" << b7;
@@ -164,7 +165,7 @@ void ReamerABS::onReadyRead()
     Qcout << "\n bytes 9:" << b9;
     Qcout << "\n";
 
-    if(b5==1)
+    if(b8==1)
     {ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(0));
      ui->RenderReamer->SetSettings("system","clws",true);}
     if(b6==1)
@@ -173,17 +174,17 @@ void ReamerABS::onReadyRead()
     if(b7==1)
     {ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(16));
      ui->RenderReamer->SetSettings("system","clws",true);}
-    if(b8==1)
+    if(b5==1)
     {ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(24));
      ui->RenderReamer->SetSettings("system","clws",true);}
     if(b9==1)
     {
-        if((b4-120)>0)
+        if((b4-60)>0)
             ui->RenderReamer->SetSettings("system","clws",true);
         else
             ui->RenderReamer->SetSettings("system","clws",false);
 
-        ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(abs(b4-120)));
+        ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(abs(b4-60)));
 
     }
 

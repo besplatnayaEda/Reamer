@@ -80,11 +80,9 @@ void MainReamer::paintGL() // none
     glVertex2d(static_cast<GLdouble>(.0f),static_cast<GLdouble>(.0f));
     glVertex2d((*ray_position)->x,(*ray_position)->y);
     glEnd();
-//    DrawRangeThread DRThread;
     if(settings["trash"]["show"].toBool() && !Cache.trash.isEmpty())
         DrawTrash();
     if(!range.isEmpty())
-//        DRThread.start();
         DrawRange();
     if(!azimuth.isEmpty())
         DrawAzimuth();
@@ -136,10 +134,26 @@ void MainReamer::GenerationRay()
 
 void MainReamer::GenerationRay(qint16 angle)
 {
+//    ray.clear();
+//    Points*i=radians,*end=radians+angle;
+////qDebug("%d  %d  %d  %d",angle,i,end,radians);
+//    while(i<end)ray.append(clockwise ? end-- : i++);
     ray.clear();
-    Points*i=radians,*end=radians+angle;
-//qDebug("%d  %d  %d  %d",angle,i,end,radians);
-    while(i<end)ray.append(clockwise ? end-- : i++);
+    Points*i,*end;
+    if(clockwise)
+    {
+        i=radians+radians_size-angle,end=radians+radians_size;
+        while(i<end)ray.append(!clockwise ? i++ : end--);
+        i=radians,end=radians+angle;
+        while(i<end)ray.append(!clockwise ? i++ : end--);
+    }
+    else
+    {
+        i=radians,end=radians+angle;
+        while(i<end)ray.append(!clockwise ? i++ : end--);
+        i=radians+radians_size-angle,end=radians+radians_size;
+        while(i<end)ray.append(!clockwise ? i++ : end--);
+    }
 }
 
 qreal MainReamer::CalcAlpha(qreal angle) const
@@ -150,8 +164,20 @@ qreal MainReamer::CalcAlpha(qreal angle) const
     else
     {
         alpha=(clockwise ? -1 : 1)*((*ray_position)->angle-angle)-.01;
-        if(not_clean && alpha<.0f)
-            alpha+=2u*M_PI;
+//        if(not_clean && alpha<.0f)
+//            alpha+=2u*M_PI;
+        if(!not_clean)
+            return alpha;
+        if(clockwise && (*ray_position)->angle-angle>0)
+        {
+            alpha+=GetRadianValue(angle);
+            alpha=1-alpha;
+        }
+        if(!clockwise && angle-(*ray_position)->angle>0)
+        {
+            alpha-=GetRadianValue(angle);
+            alpha=1-alpha;
+        }
     }
     return alpha;
 }
@@ -177,7 +203,7 @@ void MainReamer::ContinueSearch()
         if((ray.end()-ray_position)>speed)
             ray_position+=speed;
         else
-            ray_position+=1;
+            ray_position+=1/*abs(ray.end()-ray_position)*/;
     }
     else
     {
@@ -185,7 +211,7 @@ void MainReamer::ContinueSearch()
         if((ray_position-ray.begin())>speed)
             ray_position-=speed;
         else
-            ray_position-=1;
+            ray_position-=1/*abs(ray_position-ray.begin())*/;
     }
 }
 
@@ -248,6 +274,17 @@ void MainReamer::GenerationRange()
 //        }
 //        glEnd();
 //    }
+//}
+
+//void MainReamer::DrawRange() const
+//{
+////    QThread* thread = new QThread;
+////    DrawRangeThread* worker = new process();
+////    worker->moveToThread(thread);
+////    connect(thread, SIGNAL(started()), worker, SLOT(process()));
+////    thread->start();
+//    DrawRangeThread DRThread;
+//    DRThread.start();
 //}
 
 void MainReamer::DrawRange() const
