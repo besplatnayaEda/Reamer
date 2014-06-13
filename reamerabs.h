@@ -12,7 +12,6 @@ namespace Ui { class ReamerABS;}
 
 class QTimer;
 class QextSerialPort;
-class QextSerialEnumerator;
 
 class ReamerABS : public QWidget
 {
@@ -23,19 +22,22 @@ public:
     ~ReamerABS();
 
 private:
+    void setDefaultSettings();
+    void sortArray();
+    void updateSettings();
     Ui::ReamerABS *ui;
     QTimer *timer;
-    QextSerialPort *port;
-    QextSerialEnumerator *enumerator;
+    QextSerialPort *port_1, *port_2;
+
 
 private slots:
     void onReadyRead();
 
 protected:
     void keyPressEvent(QKeyEvent* ke);
+    QByteArray data_unSort_1,data_unSort_2;
+    quint8 fps,i,j, spd,b1,b2,b3,b4,b5,b6, data_port_1[48],data_port_2[48];
+    quint8 STOP,ROT2,ROT4,ROT6,FINE, data_old1[48],data_old2[48];
 
-    quint8 fps,b1,b2,b3,b4,b5,b6,b7,b8,b9,reg1[7],reg2[7],reg3[7];
-
-    QString pname,pread;
 };
 #endif // REAMERABS_H

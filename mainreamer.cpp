@@ -88,8 +88,8 @@ void MainReamer::paintGL() // none
         DrawAzimuth();
     if(settings["local_items"]["show"].toBool() && !Cache.local_items.isEmpty())
         DrawLocalItems();
-//    if(settings["meteo"]["show"].toBool() && !Cache.meteo.isEmpty())
-//        DrawMeteo();
+    if(settings["meteo"]["show"].toBool() && !Cache.meteo.isEmpty())
+        DrawMeteo();
     if(settings["active_noise_trash"]["show"].toBool() && !Cache.active_noise_trash.isEmpty())
         DrawActiveNoiseTrash();
 //    if(!TargetsSettings::targets.isEmpty())
@@ -134,11 +134,11 @@ void MainReamer::GenerationRay()
 
 void MainReamer::GenerationRay(qint16 angle)
 {
-//    ray.clear();
-//    Points*i=radians,*end=radians+angle;
-////qDebug("%d  %d  %d  %d",angle,i,end,radians);
-//    while(i<end)ray.append(clockwise ? end-- : i++);
     ray.clear();
+    Points*i=radians,*end=radians+angle;
+//qDebug("%d  %d  %d  %d",angle,i,end,radians);
+    while(i<end)ray.append(clockwise ? end-- : i++);
+    /*ray.clear();
     Points*i,*end;
     if(clockwise)
     {
@@ -153,7 +153,7 @@ void MainReamer::GenerationRay(qint16 angle)
         while(i<end)ray.append(!clockwise ? i++ : end--);
         i=radians+radians_size-angle,end=radians+radians_size;
         while(i<end)ray.append(!clockwise ? i++ : end--);
-    }
+    }*/
 }
 
 qreal MainReamer::CalcAlpha(qreal angle) const
@@ -164,20 +164,20 @@ qreal MainReamer::CalcAlpha(qreal angle) const
     else
     {
         alpha=(clockwise ? -1 : 1)*((*ray_position)->angle-angle)-.01;
-//        if(not_clean && alpha<.0f)
-//            alpha+=2u*M_PI;
-        if(!not_clean)
-            return alpha;
-        if(clockwise && (*ray_position)->angle-angle>0)
-        {
-            alpha+=GetRadianValue(angle);
-            alpha=1-alpha;
-        }
-        if(!clockwise && angle-(*ray_position)->angle>0)
-        {
-            alpha-=GetRadianValue(angle);
-            alpha=1-alpha;
-        }
+        if(not_clean && alpha<.0f)
+            alpha+=2u*M_PI;
+//        if(!not_clean)
+//            return alpha;
+//        if(clockwise && (*ray_position)->angle-angle>0)
+//        {
+//            alpha+=GetRadianValue(angle);
+//            alpha=1-alpha;
+//        }
+//        if(!clockwise && angle-(*ray_position)->angle>0)
+//        {
+//            alpha-=GetRadianValue(angle);
+//            alpha=1-alpha;
+//        }
     }
     return alpha;
 }
@@ -214,7 +214,6 @@ void MainReamer::ContinueSearch()
             ray_position-=1/*abs(ray_position-ray.begin())*/;
     }
 }
-
 
 void MainReamer::GenerationRange()
 {
@@ -254,7 +253,7 @@ void MainReamer::GenerationRange()
         d++;
     }
 }
-
+/*
 //void DrawRangeThread::run()
 //{
 //    qreal alpha;
@@ -286,7 +285,7 @@ void MainReamer::GenerationRange()
 //    DrawRangeThread DRThread;
 //    DRThread.start();
 //}
-
+*/
 void MainReamer::DrawRange() const
 {
     qreal alpha;
@@ -307,7 +306,6 @@ void MainReamer::DrawRange() const
         glEnd();
     }
 }
-
 
 void MainReamer::GenerationAzimuth()
 {
@@ -460,10 +458,18 @@ void MainReamer::DrawLocalItems() const
 
 void MainReamer::GenerationMeteo()
 {
-    CreateEllipseTrashArea(Cache.meteo,20.0f,20.0f,3u,true);
-    CreateEllipseTrashArea(Cache.meteo,-20.0f,20.0f,3u,true,false);
-    CreateEllipseTrashArea(Cache.meteo,-30.0f,-30.0f,3u,true,false);
-    CreateEllipseTrashArea(Cache.meteo,-50.0f,-10.0f,3u,true,false);
+    CreateEllipseTrashArea(Cache.meteo, .0f,20.0f, 45.0f,45.0f ,    3u/*,false,true*/);
+    CreateEllipseTrashArea(Cache.meteo1, .0f,30.0f, 190.0f,120.0f,    3u/*,false,true*/);
+    CreateEllipseTrashArea(Cache.meteo2, .0f,40.0f, -125.0f,250.0f,  3u/*,false,true*/);
+    CreateEllipseTrashArea(Cache.meteo3, .0f,50.0f, -210.0f,160.0f, 3u/*,false,true*/);
+}
+
+void MainReamer::DrawMeteo() const
+{
+    DrawEllipseTrashArea(Cache.meteo);
+    DrawEllipseTrashArea(Cache.meteo1);
+    DrawEllipseTrashArea(Cache.meteo2);
+    DrawEllipseTrashArea(Cache.meteo3);
 }
 
 void MainReamer::GenerationActiveNoiseTrash()

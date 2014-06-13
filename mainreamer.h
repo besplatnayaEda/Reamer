@@ -87,7 +87,7 @@ protected:
     Points radians[ANGLE_RANGE];
     struct Coordinates
     {
-        QVector<PointsPath>trash,local_items,meteo;
+        QVector<PointsPath>trash,local_items,meteo,meteo1,meteo2,meteo3;
         QVector<LineEntity>active_noise_trash;
     }Cache;
     QVector<LineEntity>range;
@@ -126,8 +126,8 @@ template<typename OptionType>void MainReamer::SetSettings(const QString group,co
             GenerationTrash();
             GenerationRange();
             GenerationLocalItems();
-//            if(Cache.meteo.isEmpty())
-//                GenerationMeteo();
+            if(Cache.meteo.isEmpty())
+                GenerationMeteo();
             if(Cache.active_noise_trash.isEmpty())
                 GenerationActiveNoiseTrash();
         }
