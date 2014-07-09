@@ -3,7 +3,7 @@
 #include "ui_reamerabs.h"
 #include <QDebug>
 #include <QtCore>
-#include "math.h"
+#include <QThread>
 
 ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
 {
@@ -13,24 +13,29 @@ ReamerABS::ReamerABS(QWidget *parent) : QWidget(parent),ui(new Ui::ReamerABS)
 //    timer->setInterval(40);
 
     setDefaultSettings();
-
+/*
     PortSettings settings = {BAUD19200, DATA_8, PAR_NONE, STOP_2, FLOW_OFF, 10};
     port_1 = new QextSerialPort("COM4", settings, QextSerialPort::EventDriven);
-    port_1->open(QIODevice::ReadWrite);
+    port_1->op4en(QIODevice::ReadWrite);
     port_2 = new QextSerialPort("COM5", settings, QextSerialPort::EventDriven);
     port_2->open(QIODevice::ReadWrite);
     connect(port_1, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(port_2, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
-
+*/
 //    connect(timer, SIGNAL(timeout()), SLOT(onReadyRead()));
+
+    QThread *threadOne = new QThread();//Создаем поток для порта платы
+    Port *PortOne = new Port;//Создаем обьект по классу
+    PortOne->moveToThread(threadOne);//помешаем класс  в поток
+    threadOne->start();
 
 }
 
 ReamerABS::~ReamerABS()
 {
     delete ui;
-    delete port_1;
-    delete port_2;
+//    delete port_1;
+//    delete port_2;
 //    delete timer;
 }
 
@@ -62,7 +67,7 @@ void ReamerABS::setDefaultSettings()
 
     ui->RenderReamer->ChangeFPS(fps>0 ? 1000/fps : 0);
 }
-
+/*
 void ReamerABS::sortArray()
 {
     quint8 j, m, k;
@@ -239,7 +244,7 @@ void ReamerABS::updateSettings()
         ui->RenderReamer->SetSettings("system","varu",static_cast<qreal>(1)/100);
 */
 //    return;
-}
+//}
 
 void ReamerABS::keyPressEvent(QKeyEvent *ke)
 {
@@ -376,6 +381,7 @@ void ReamerABS::keyPressEvent(QKeyEvent *ke)
 
 }
 
+/*
 void ReamerABS::onReadyRead()
 {
     QTextStream Qcout(stdout);
@@ -451,4 +457,4 @@ void ReamerABS::onReadyRead()
 
 //    updateSettings();
 
-}
+//}

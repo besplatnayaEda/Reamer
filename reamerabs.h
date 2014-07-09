@@ -6,12 +6,13 @@
 #include <QPointer>
 #include <QObject>
 #include <QDialog>
+#include "port.h"
 
 
 namespace Ui { class ReamerABS;}
 
 class QTimer;
-class QextSerialPort;
+//class QextSerialPort;
 
 class ReamerABS : public QWidget
 {
@@ -23,21 +24,21 @@ public:
 
 private:
     void setDefaultSettings();
-    void sortArray();
-    void updateSettings();
+//    void sortArray();
+//    void updateSettings();
     Ui::ReamerABS *ui;
     QTimer *timer;
-    QextSerialPort *port_1, *port_2;
+//    QextSerialPort *port_1, *port_2;
 
 
 private slots:
-    void onReadyRead();
+//    void onReadyRead();
 
 protected:
     void keyPressEvent(QKeyEvent* ke);
-    QByteArray data_unSort_1,data_unSort_2;
+//    QByteArray data_unSort_1,data_unSort_2;
     quint8 fps,i,j, spd,b1,b2,b3,b4,b5,b6, data_port_1[48],data_port_2[48];
-    quint8 STOP,ROT2,ROT4,ROT6,FINE, data_old1[48],data_old2[48];
+//    quint8 STOP,ROT2,ROT4,ROT6,FINE, data_old1[48],data_old2[48];
 
 };
 #endif // REAMERABS_H

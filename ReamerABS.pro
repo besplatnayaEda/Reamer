@@ -18,11 +18,13 @@ TEMPLATE = app
 
 SOURCES  +=     main.cpp\
                 reamerabs.cpp \
-                mainreamer.cpp
+                mainreamer.cpp \
+    port.cpp
 
 HEADERS  +=     reamerabs.h \
                 mainreamer.h \
-                helper.h
+                helper.h \
+    port.h
 
 FORMS    +=     reamerabs.ui
 
