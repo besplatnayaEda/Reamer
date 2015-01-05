@@ -1,4 +1,9 @@
 #include "port.h"
+#include "reamerabs.h"
+#include "ui_reamerabs.h"
+#include <QDebug>
+#include <QtCore>
+#include <QThread>
 
 Port::Port(QObject *parent) : QObject(parent)
 {
@@ -88,7 +93,7 @@ void Port::sortArray()
     }
 
 }
-
+/*
 void Port::updateSettings()
 {
     if(STOP==1) //stop
@@ -120,7 +125,7 @@ void Port::updateSettings()
 
         ui->RenderReamer->SetSettings("system","freq",static_cast<quint8>(abs(ceil(spd-67))));
 
-    }
+    }*/
 /*
     if(data_port_1[10]==1)    //vkl
     {
@@ -194,7 +199,7 @@ void Port::updateSettings()
         ui->RenderReamer->SetSettings("system","varu",static_cast<qreal>(1)/100);
 */
 //    return;
-}
+//}
 
 
 void Port::onReadyRead()

@@ -2,6 +2,11 @@
 #define PORT_H
 
 #include <QWidget>
+#include <QtGui>
+#include <QPointer>
+#include <QObject>
+#include <QDialog>
+#include <qextserialport.h>
 
 
 namespace Ui { class Port;}
